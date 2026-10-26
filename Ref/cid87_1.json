@@ -1,0 +1,16 @@
+{
+	"Modality": "MR",
+	"InstitutionalDepartmentName": "None",
+	"SeriesNumber": 1,
+	"SliceThickness": 1,
+	"ReconMatrixPE": 32,
+	"ImageOrientationPatientDICOM": [
+		1,
+		0,
+		0,
+		0,
+		1,
+		0	],
+	"ConversionSoftware": "dcm2niix",
+	"ConversionSoftwareVersion": "v1.0.20261024"
+}
