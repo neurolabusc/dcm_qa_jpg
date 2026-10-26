@@ -14,7 +14,7 @@ exists() {
 # we assume it is in the users path
 # however, this could be set explicitly, e.g.
 #  exenam="/Users/rorden/Documents/cocoa/dcm2niix/console/dcm2niix" batch.sh
-exenam=${examnam:-dcm2niix}
+exenam=${exenam:-dcm2niix}
 
 #basedir is folder with "Ref" and "In" subfolders.
 # we assume it is the same same folder as the script
@@ -74,26 +74,27 @@ if [ ! -d "$outdir" ]; then
  mkdir ${outdir}
 fi
 
-if [ ! -z "$(ls $outdir)" ]; then
+if [ ! -z "$(ls "$outdir")" ]; then
  echo "Cleaning output directory: $outdir"
- rm ${outdir}/*
+ rm -f "${outdir}"/*
 fi
 
 # Convert images.
 set -x
-# One folder per file: all share UIDs, so a single pass would merge them
+# One run per case: cid* share UIDs and would merge. Keep going on failure so every case reaches the diff.
+fail=0
 for d in "$indir"/*/; do
-    $exenam ${flags} -o "$outdir" "$d"
+    $exenam ${flags} -o "$outdir" "$d" || fail=1
 done
 set +x
 
 # Validate JSON.
-exists python &&
+exists python3 &&
     {
         printf "\n\n\nValidating JSON files.\n\n\n"
         for file in $outdir/*.json; do
             echo -n "$file "
-            ! python -m json.tool "$file" > /dev/null || echo " --  Valid."
+            ! python3 -m json.tool "$file" > /dev/null || echo " --  Valid."
         done
         printf "\n\n\n"
     }
@@ -109,4 +110,4 @@ dsstore=${outdir}/.DS_Store
 set -x
 diff -x '.*' -br "$refdir" "$outdir" -I ConversionSoftwareVersion -I BidsGuess
 set +x
-
+exit $fail
